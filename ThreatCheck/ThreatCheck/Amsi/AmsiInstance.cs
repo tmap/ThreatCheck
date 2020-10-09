@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Text;
+
 using static ThreatCheck.NativeMethods;
 
 namespace ThreatCheck
 {
-    class AmsiInstance : IDisposable
+    class AmsiInstance : Scanner, IDisposable
     {
         IntPtr AmsiContext;
         IntPtr AmsiSession;
 
         byte[] FileBytes;
-        bool Malicious = false;
-        bool Complete = false;
 
         public AmsiInstance(string appName = "ThreatCheck")
         {
@@ -69,56 +68,6 @@ namespace ThreatCheck
                     Buffer.BlockCopy(tmpArray, 0, splitArray, 0, tmpArray.Length);
                 }
             }
-        }
-
-        byte[] HalfSplitter(byte[] originalarray, int lastgood) //Will round down to nearest int
-        {
-            var splitArray = new byte[(originalarray.Length - lastgood) / 2 + lastgood];
-
-            if (originalarray.Length == splitArray.Length + 1)
-            {
-                var msg = string.Format("Identified end of bad bytes at offset 0x{0:X}", originalarray.Length);
-
-                CustomConsole.WriteThreat(msg);
-
-                byte[] offendingBytes = new byte[256];
-
-                if (originalarray.Length < 256)
-                {
-                    Array.Resize(ref offendingBytes, originalarray.Length);
-                    Buffer.BlockCopy(originalarray, originalarray.Length, offendingBytes, 0, originalarray.Length);
-                }
-                else
-                {
-                    Buffer.BlockCopy(originalarray, originalarray.Length - 256, offendingBytes, 0, 256);
-                }
-
-                Helpers.HexDump(offendingBytes);
-                Complete = true;
-            }
-
-            Array.Copy(originalarray, splitArray, splitArray.Length);
-            return splitArray;
-        }
-
-        byte[] Overshot(byte[] originalarray, int splitarraysize)
-        {
-            var newsize = (originalarray.Length - splitarraysize) / 2 + splitarraysize;
-
-            if (newsize.Equals(originalarray.Length - 1))
-            {
-                Complete = true;
-
-                if (Malicious)
-                {
-                    CustomConsole.WriteError("File is malicious, but couldn't identify bad bytes");
-                }
-            }
-
-            var newarray = new byte[newsize];
-            Buffer.BlockCopy(originalarray, 0, newarray, 0, newarray.Length);
-
-            return newarray;
         }
 
         AMSI_RESULT ScanBuffer(byte[] buffer)

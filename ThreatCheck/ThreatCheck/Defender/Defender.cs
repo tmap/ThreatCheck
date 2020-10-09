@@ -5,12 +5,10 @@ using System.IO;
 
 namespace ThreatCheck
 {
-    class Defender
+    class Defender : Scanner
     {
         byte[] FileBytes;
         string FilePath;
-        bool Malicious = false;
-        bool Complete = false;
 
         public Defender(byte[] file)
         {
@@ -30,7 +28,7 @@ namespace ThreatCheck
             FilePath = Path.Combine(@"C:\Temp", "file.exe");
             File.WriteAllBytes(FilePath, FileBytes);
 
-            var status = Scan(FilePath);
+            var status = ScanFile(FilePath);
 
             if (status.Result == ScanResult.NoThreatFound)
             {
@@ -55,9 +53,9 @@ namespace ThreatCheck
                 CustomConsole.WriteDebug($"Testing {splitArray.Length} bytes");
 #endif
                 File.WriteAllBytes(FilePath, splitArray);
-                var detectionStatus = Scan(FilePath);
+                status = ScanFile(FilePath);
 
-                if (detectionStatus.Result == ScanResult.ThreatFound)
+                if (status.Result == ScanResult.ThreatFound)
                 {
 #if DEBUG
                     CustomConsole.WriteDebug("Threat found, splitting");
@@ -66,7 +64,7 @@ namespace ThreatCheck
                     Array.Resize(ref splitArray, tmpArray.Length);
                     Array.Copy(tmpArray, splitArray, tmpArray.Length);
                 }
-                else if (detectionStatus.Result == ScanResult.NoThreatFound)
+                else if (status.Result == ScanResult.NoThreatFound)
                 {
 #if DEBUG
                     CustomConsole.WriteDebug("No threat found, increasing size");
@@ -79,7 +77,7 @@ namespace ThreatCheck
             }
         }
 
-        public DefenderScanResult Scan(string file, bool getsig = false)
+        public DefenderScanResult ScanFile(string file, bool getsig = false)
         {
             var result = new DefenderScanResult();
 
@@ -142,64 +140,6 @@ namespace ThreatCheck
             }
 
             return result;
-        }
-
-        byte[] HalfSplitter(byte[] originalarray, int lastgood)
-        {
-            var splitArray = new byte[(originalarray.Length - lastgood) / 2 + lastgood];
-
-            if (originalarray.Length == splitArray.Length + 1)
-            {
-                var result = Scan(FilePath, true);
-                var msg = string.Format("Identified end of bad bytes at offset 0x{0:X}", originalarray.Length);
-                var sig = string.Format("File matched signature {0}", result.Signature);
-
-                CustomConsole.WriteThreat(msg);
-                CustomConsole.WriteThreat(sig);
-
-                byte[] offendingBytes = new byte[256];
-
-                if (originalarray.Length < 256)
-                {
-                    Array.Resize(ref offendingBytes, originalarray.Length);
-                    Buffer.BlockCopy(originalarray, originalarray.Length, offendingBytes, 0, originalarray.Length);
-                }
-                else
-                {
-                    Buffer.BlockCopy(originalarray, originalarray.Length - 256, offendingBytes, 0, 256);
-                }
-
-                Helpers.HexDump(offendingBytes);
-
-#if DEBUG
-                CustomConsole.WriteDebug($"Removing {FilePath}");
-#endif
-                File.Delete(@"C:\Temp\testfile.exe");
-                Complete = true;
-            }
-
-            Array.Copy(originalarray, splitArray, splitArray.Length);
-            return splitArray;
-        }
-
-        byte[] Overshot(byte[] originalarray, int splitarraysize)
-        {
-            var newsize = (originalarray.Length - splitarraysize) / 2 + splitarraysize;
-
-            if (newsize.Equals(originalarray.Length - 1))
-            {
-                Complete = true;
-
-                if (Malicious)
-                {
-                    CustomConsole.WriteError("File is malicious, but couldn't identify bad bytes");
-                }
-            }
-
-            var newarray = new byte[newsize];
-            Buffer.BlockCopy(originalarray, 0, newarray, 0, newarray.Length);
-
-            return newarray;
         }
     }
 

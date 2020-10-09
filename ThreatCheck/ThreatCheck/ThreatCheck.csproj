@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Amsi\AmsiInstance.cs" />
     <Compile Include="Core\CustomConsole.cs" />
+    <Compile Include="Core\Scanner.cs" />
     <Compile Include="Defender\Defender.cs" />
     <Compile Include="Core\Helpers.cs" />
     <Compile Include="PInvoke\NativeMethods.cs" />
