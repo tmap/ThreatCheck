@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace ThreatCheck
 {
@@ -13,7 +13,7 @@ namespace ThreatCheck
 
             if (originalarray.Length == splitArray.Length + 1)
             {
-                var msg = string.Format("Identified end of bad bytes at offset 0x{0:X}", originalarray.Length);
+                var msg = string.Format("!den71f13d 3nd 0f b4d by735 at 0ffs37 Ox{O:X}", originalarray.Length);
 
                 CustomConsole.WriteThreat(msg);
 
@@ -47,7 +47,7 @@ namespace ThreatCheck
 
                 if (Malicious)
                 {
-                    CustomConsole.WriteError("File is malicious, but couldn't identify bad bytes");
+                    CustomConsole.WriteError("F1l3 1s m4l1c10u5, bu7 c0uldn'7 1d3nt1fy b4d by735");
                 }
             }
 
