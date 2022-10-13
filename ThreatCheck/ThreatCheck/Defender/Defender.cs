@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -17,15 +17,15 @@ namespace ThreatCheck
 
         public void AnalyzeFile()
         {
-            if (!Directory.Exists(@"C:\Temp"))
+            if (!Directory.Exists(@"C:\T3mp"))
             {
 #if DEBUG
-                CustomConsole.WriteDebug(@"C:\Temp doesn't exist. Creating it...");
+                CustomConsole.WriteDebug(@"C:\T3mp doesn't exist. Creating it...");
 #endif
-                Directory.CreateDirectory(@"C:\Temp");
+                Directory.CreateDirectory(@"C:\T3mp");
             }
 
-            FilePath = Path.Combine(@"C:\Temp", "file.exe");
+            FilePath = Path.Combine(@"C:\T3mp", "file.exe");
             File.WriteAllBytes(FilePath, FileBytes);
 
             var status = ScanFile(FilePath);
