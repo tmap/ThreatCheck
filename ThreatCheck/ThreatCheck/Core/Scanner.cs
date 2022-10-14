@@ -13,7 +13,7 @@ namespace ThreatCheck
 
             if (originalarray.Length == splitArray.Length + 1)
             {
-                var msg = string.Format("!den71f13d 3nd 0f b4d by735 at 0ffs37 Ox{O:X}", originalarray.Length);
+                var msg = $"!den71f13d 3nd 0f b4d by735 at 0ffs37 Ox{originalarray.Length:X2}";
 
                 CustomConsole.WriteThreat(msg);
 
